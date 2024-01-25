@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Phone Who Dis?</title>
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .message-container {
+            width: 500px;
+            max-height: 400px;
+            overflow-y: auto;
+            left: 400px;
+            top: 340px;
+            position: absolute;
+            padding: 10px;
+            background-color: black;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column; /* Adjusted to column for top-to-bottom appearance */
+        }
+
+        .text-bubble {
+            position: relative;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 8px;
+            max-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            align-self: flex-end; /* Align to the right */
+        }
+
+        .dark-grey-bubble {
+            position: relative;
+            padding: 10px;
+            background-color: #333333;
+            color: white;
+            border-radius: 8px;
+            max-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            align-self: flex-start; /* Align to the left */
+        }
+
+        .tail {
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 10px solid #3498db;
+            top: 50%;
+            right: -10px;
+            transform: translateY(-50%);
+        }
+
+        /* Smaller font size */
+        .text-bubble p,
+        .dark-grey-bubble p {
+            font-size: 14px;
+            margin: 0; /* Remove default paragraph margin */
+        }
+
+        /* Reply input styling */
+        #replyInput {
+            opacity: 1;
+            left: 400px;
+            top: 750px;
+            position: absolute;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            margin-right: 20px; /* Spacing to the right */
+        }
+
+        #submitButton {
+            left: 600px;
+            top: 750px;
+            position: absolute;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="Rectangle1" style="width: 100%; height: 291.38px; left: 0px; top: 0px; position: absolute; opacity: 0.20; background:#222222"></div>
+
+    <div class="message-container" id="messageContainer">
+        <!-- System messages will go here -->
+    </div>
+
+    <div>
+        <input type="text" id="replyInput" placeholder="Reply...">
+        <button onclick="processUserInput()" id="submitButton">Send</button>
+    </div>
+
+ 
+    <script>
+        var playerNames = [];
+        var currentPlayerIndex = 0;
+        var totalPlayers = 0;
+        var themes = ["serious", "depressing", "normal", "weird", "unpredictable", "awkward", "dramatic", "sarcastic", "your choice"];
+        var currentTheme = "";
+        var previousTheme = "";
+        var playerPoints = {};
+        var currentRound = 0;
+        var totalRounds = 9;
+
+        function displayMessage(message, isSystemMessage) {
+            var messageContainer = document.getElementById("messageContainer");
+            var messageBubble = document.createElement("div");
+            messageBubble.className = isSystemMessage ? "dark-grey-bubble" : "text-bubble";
+            messageBubble.innerHTML = "<p>" + message + "</p>";
+            messageContainer.appendChild(messageBubble);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        function askNumberOfPlayers() {
+            displayMessage("New Phone Who Dis? How many players will we have today? (2-4 players)", true);
+        }
+
+        function askPlayerName(playerIndex) {
+            displayMessage("Enter a name for Player " + playerIndex + ": ", true);
+        }
+
+        function startRound() {
+            if (currentRound < totalRounds) {
+                currentRound++;
+
+                // Save the current theme as the previous theme
+                previousTheme = currentTheme;
+
+                // Generate a random theme for the round
+                do {
+                    currentTheme = themes[Math.floor(Math.random() * themes.length)];
+                } while (currentTheme === previousTheme);
+
+                // Display the theme to the users
+                displayMessage("Round " + currentRound + " theme: " + currentTheme, true);
+
+                // Prompt the user to add points for a player
+                displayMessage("Add a point for a player by entering their name:", true);
+            } else {
+                // Game has ended
+                displayMessage("Game over! Thanks for playing.", true);
+            }
+        }
+
+
+        function displayPointsBoard() {
+            // Display the points earned in the current round
+            var roundPointsMessage = "Round " + currentRound + " Points:\n";
+            for (var playerName in playerPoints) {
+                roundPointsMessage += playerName + ": " + playerPoints[playerName] + " points\n";
+            }
+            displayMessage(roundPointsMessage, true);
+
+            // Display the overall points board
+            var pointsMessage = "Overall Points Board (Up to Round " + currentRound + "):\n";
+            var highestScore = 0;
+            var winner = "";
+
+            for (var playerName in playerPoints) {
+                pointsMessage += playerName + ": " + playerPoints[playerName] + " points\n";
+
+                // Check for the highest score and update the winner
+                if (playerPoints[playerName] > highestScore) {
+                    highestScore = playerPoints[playerName];
+                    winner = playerName;
+                }
+            }
+
+            displayMessage(pointsMessage, true);
+
+            // Announce the winner after the last round
+            if (currentRound === totalRounds) {
+                displayMessage("Game over! The winner is: " + winner + " with " + highestScore + " points!", true);
+            } else {
+                // Start the next round if the game is not over
+                startRound();
+            }
+        }
+
+        function processUserInput() {
+            var replyInput = document.getElementById("replyInput");
+            var userInput = replyInput.value.trim();
+
+            if (userInput !== "") {
+                displayMessage(userInput, false);
+
+                switch (currentPlayerIndex) {
+                    case 0:
+                        // Handle number of players input
+                        totalPlayers = parseInt(userInput);
+                        if (!isNaN(totalPlayers) && totalPlayers >= 2 && totalPlayers <= 4) {
+                            displayMessage("Great! We'll have " + totalPlayers + " players.", true);
+                            currentPlayerIndex++;
+                            askPlayerName(currentPlayerIndex);
+                        } else {
+                            displayMessage("Invalid number of players. Please choose between 2 and 4 players.", true);
+                            askNumberOfPlayers(); // Ask again
+                        }
+                        break;
+                    default:
+                        // Handle player names input
+                        if (playerNames.length < totalPlayers) {
+                            playerNames.push(userInput);
+                            playerPoints[userInput] = 0; // Assign an initial score of 0
+                            currentPlayerIndex++;
+
+                            if (currentPlayerIndex <= totalPlayers) {
+                                askPlayerName(currentPlayerIndex);
+                            } else {
+                                displayMessage("Let the game begin!", true);
+                                startRound(); // Start the first round
+                            }
+                        } else {
+                            // Handle points input
+                            if (playerPoints.hasOwnProperty(userInput)) {
+                                playerPoints[userInput]++;
+                                displayMessage(userInput + " earned 1 point in Round " + currentRound + "!", true);
+                                currentPlayerIndex++;
+
+                                if (currentPlayerIndex <= totalPlayers) {
+                                    askPlayerName(currentPlayerIndex);
+                                } else {
+                                    displayPointsBoard(); // Display points board after each round
+                                }
+                            } else {
+                                displayMessage("Invalid name. Please enter a valid player name.", true);
+                            }
+                        }
+                        break;
+                }
+
+                // Clear the input field
+                replyInput.value = "";
+            }
+        }
+
+        window.onload = function() {
+            // Greet the user with an initial message
+            askNumberOfPlayers();
+
+            // Add event listener for Enter key press
+            document.getElementById("replyInput").addEventListener("keyup", function(event) {
+                if (event.key === "Enter") {
+                    processUserInput();
+                }
+            });
+        };
+    </script>
+    
+    
+    
+    
+    
+    
+    <img class="Image1" style="width: 112.24px; height: 112.24px; left: 621.51px; top: 84px; position: absolute" src="images/image 1.png" />
+    <div class="20Pm" style="width: 142.85px; height: 32.89px; left: 190.90px; top: 40.88px; position: absolute; text-align: center; color: white; font-size: 26px; font-family: Inter; font-weight: 500; word-wrap: break-word">4:20 PM</div>
+    <div class="Ellipse1" style="width: 129.92px; height: 124.04px; left: 612.68px; top: 83.67px; position: absolute; opacity: 0.10; background: #D9D9D9; border-radius: 9999px"></div>
+    <img class="Image2" style="width: 82.23px; height: 49.34px; left: 108.67px; top: 121.02px; position: absolute" src="images/image 2.png" />
+    <img class="Image4" style="width: 284.72px; height: 53.35px; left: 1045.59px; top: 30.65px; position: absolute" src="images/image 4.png" />
+    <div class="NewPhoneWhoDis" style="width: 305.88px; height: 36.18px; left: 502.45px; top: 230.54px; position: absolute; text-align: center; color: white; font-size: 18px; font-family: Inter; font-weight: 500; word-wrap: break-word">New Phone Who Dis ?</div>
+    <img class="Image5" style="width: 27.43px; height: 24.67px; left: 770.33px; top: 230.54px; position: absolute; transform-origin: 0 0; opacity: 0.50" src="images/image 5.png" />
+    <img class="Image6" style="width: 69.07px; height: 71.71px; left: 1203.69px; top: 109.83px; position: absolute" src="images/image 6.png" />
+</body>
+</html>
