@@ -83,10 +83,12 @@
             position: absolute;
             padding: 10px;
             border-radius: 8px;
-            border: none;
+            border: 1px solid #333333;
             margin-right: 20px; /* Spacing to the right */
+            color: white; /* Text color */
+            background-color: black; /* Background color */
         }
-
+    
         #submitButton {
             left: 600px;
             top: 750px;
@@ -98,6 +100,11 @@
             color: white;
             cursor: pointer;
         }
+
+        #submitButton img {
+            width: 100%; /* Make the image fill the button */
+            height: 100%; /* Make the image fill the button */
+        }
     </style>
 </head>
 <body>
@@ -108,8 +115,10 @@
     </div>
 
     <div>
-        <input type="text" id="replyInput" placeholder="Reply...">
-        <button onclick="processUserInput()" id="submitButton">Send</button>
+        <input type="text" id="replyInput" placeholder="iMessage">
+        <button onclick="processUserInput()" id="submitButton">
+            <img src="images/arrow.png" alt="Send">
+        </button>
     </div>
 
  
